@@ -2,89 +2,80 @@
 
 using namespace std;
 
-ByteStream::ByteStream( uint64_t capacity ) : queue_(), capacity_( capacity ), closed_flag(false), wsize_(0), rsize_(0),  error_(false) {}
+ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), available_capacity_( capacity ) {}
 
 bool Writer::is_closed() const
 {
   // Your code here.
-  return closed_flag;
+  return is_closed_;
 }
 
 void Writer::push( string data )
 {
   // Your code here.
-  if(closed_flag || has_error())
-    return;
-  uint64_t size_can_write = min(data.size(), available_capacity());
-  wsize_ += size_can_write;
-  if(size_can_write < data.size())
-    data = data.substr(0, size_can_write);
-  for(uint64_t i = 0; i < size_can_write; i++)
-  {
-    queue_.push_back(data[i]);
-  }  
-
-  // queue_.push_back(data);
+  auto len = min( available_capacity_, data.size() );
+  if ( len < data.size() ) {
+    data = data.substr( 0, len );
+  }
+  if ( len > 0 ) {
+    bytes_pushed_ += len;
+    bytes_buffered_ += len;
+    available_capacity_ -= len;
+    buffer_.emplace_back( move( data ) );
+    buffer_view_.emplace_back( buffer_.back() );
+  }
 }
 
 void Writer::close()
 {
-  closed_flag = true;
+  is_closed_ = true;
 }
 
 uint64_t Writer::available_capacity() const
 {
-  return capacity_ - (uint64_t)queue_.size();
+    return available_capacity_;
 }
 
 uint64_t Writer::bytes_pushed() const
 {
-  return wsize_;
+  return bytes_pushed_;
 }
 
 bool Reader::is_finished() const
 {
-  return closed_flag && queue_.empty();
+  return is_closed_ && bytes_buffered_ == 0;
 }
 
 uint64_t Reader::bytes_popped() const
 {
-  return rsize_;
+  return bytes_popped_;
 }
 
 string_view Reader::peek() const
 {
-  uint64_t peek_size = min<uint64_t>(8, queue_.size());
-  return string_view(&queue_.front(), peek_size);
-
-  // return string_view(queue_.front());
-
+  return buffer_view_.front();
 }
 
 void Reader::pop( uint64_t len )
 {
-  uint64_t size_can_read = min(len, queue_.size());
-  rsize_ += size_can_read;
-
-  for(uint64_t i = 0; i < size_can_read; i++)
-  {
-    queue_.pop_front();
+    len = min( len, bytes_buffered_ );
+  auto sz = len;
+  while ( len > 0 ) {
+    auto size = buffer_view_.front().size();
+    if ( len >= size ) {
+      buffer_view_.pop_front();
+    } else {
+      buffer_view_.front().remove_prefix( len );
+      break;
+    }
+    len -= size;
   }
-
-  // while(size_can_read)
-  // {
-  //   size_can_read -= queue_.front().size();
-  //   queue_.pop_front();
-  // }
-
-  // string buf = "";
-  // Reader rd = Reader::reader();
-  // read(rd, size_can_read, buf);
-
-  
+  bytes_buffered_ -= sz;
+  bytes_popped_ += sz;
+  available_capacity_ += sz;
 }
 
 uint64_t Reader::bytes_buffered() const
 {
-  return queue_.size();
+  return bytes_buffered_;
 }
