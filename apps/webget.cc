@@ -9,9 +9,46 @@ using namespace std;
 
 void get_URL( const string& host, const string& path )
 {
-  cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+  /* 要注意空格和大小写
+  GET /hello HTTP/1.1 \r\n
+  Host: cs144.keithw.org
+  Connection: close
+  */
+
+  Address address(host, "http");
+  TCPSocket tcpsocket;
+  tcpsocket.connect(address);
+  tcpsocket.write("GET " + path + " HTTP/1.1\r\n"); 
+  tcpsocket.write("HOST: " + host + "\r\n");
+  tcpsocket.write("Connection: close\r\n");
+  tcpsocket.write("\r\n");
+  // tcpsocket.shutdown(2); // 获取不到输出
+  string buff = "";
+  while(!tcpsocket.eof())
+  {
+    tcpsocket.read(buff);
+    std::cout << buff;
+  }
+  tcpsocket.close();  
+
+    // Address addr(host, "http");
+    // TCPSocket http_tcp;
+    // http_tcp.connect(addr);
+    // http_tcp.write("GET " + path + " HTTP/1.1\r\n");
+    // http_tcp.write("HOST: " + host + "\r\n");
+    // http_tcp.write("Connection: close\r\n");
+    // http_tcp.write("\r\n");
+
+    // while(!http_tcp.eof())
+    // {
+    //   string buf = "";
+    //   http_tcp.read(buf);
+    //   cout << buf;
+    // }
+    // http_tcp.close();
 }
+
+
 
 int main( int argc, char* argv[] )
 {
