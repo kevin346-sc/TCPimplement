@@ -1,7 +1,7 @@
 #pragma once
 
 #include "byte_stream.hh"
-
+#include <unordered_map>
 class Reassembler
 {
 public:
@@ -42,4 +42,9 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+  // std::unordered_map<int, std::string> reassemble_buffer_; // (index, data) write until earlier bytes are filled in
+  // uint64_t first_unassembler_index; // index of next byte
+  // uint64_t first_unaccptale_index; // the next index of last byte 
+  // uint64_t capacity_; // whole capacity of reassembler
+  // uint64_t available_capacity_;
 };

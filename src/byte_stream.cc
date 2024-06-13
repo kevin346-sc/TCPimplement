@@ -2,12 +2,12 @@
 
 using namespace std;
 
-ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), available_capacity_( capacity ) {}
+ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), available_capacity_( capacity ), bytes_pushed_(0), bytes_popped_(0), bytes_buffered_(0) {}
 
 bool Writer::is_closed() const
 {
   // Your code here.
-  return is_closed_;
+  return closed_;
 }
 
 void Writer::push( string data )
@@ -22,13 +22,12 @@ void Writer::push( string data )
     bytes_buffered_ += len;
     available_capacity_ -= len;
     buffer_.emplace_back( move( data ) );
-    buffer_view_.emplace_back( buffer_.back() );
   }
 }
 
 void Writer::close()
 {
-  is_closed_ = true;
+  closed_ = true;
 }
 
 uint64_t Writer::available_capacity() const
@@ -43,7 +42,7 @@ uint64_t Writer::bytes_pushed() const
 
 bool Reader::is_finished() const
 {
-  return is_closed_ && bytes_buffered_ == 0;
+  return closed_ && bytes_buffered_ == 0;
 }
 
 uint64_t Reader::bytes_popped() const
@@ -51,21 +50,30 @@ uint64_t Reader::bytes_popped() const
   return bytes_popped_;
 }
 
-string_view Reader::peek() const
+string_view Reader::peek() const // just return one char element 
 {
-  return buffer_view_.front();
+  if(bytes_buffered_ == 0)
+    return string_view();
+  // const char c = buffer_.front()[0];
+  // std::string str(1, c);
+  // return string_view(str);
+  const string& str = buffer_.front();
+  return string_view(str.data(), str.size());
 }
 
 void Reader::pop( uint64_t len )
 {
-    len = min( len, bytes_buffered_ );
+  len = min( len, bytes_buffered_ );
   auto sz = len;
   while ( len > 0 ) {
-    auto size = buffer_view_.front().size();
+    auto size = buffer_.front().size();
     if ( len >= size ) {
-      buffer_view_.pop_front();
+      buffer_.pop_front();
     } else {
-      buffer_view_.front().remove_prefix( len );
+      std::string str = buffer_.front();
+      buffer_.pop_front();
+      str = str.substr(len);
+      buffer_.emplace_front(str);
       break;
     }
     len -= size;
