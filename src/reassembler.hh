@@ -1,7 +1,7 @@
 #pragma once
 
 #include "byte_stream.hh"
-
+#include <map>
 class Reassembler
 {
 public:
@@ -41,5 +41,10 @@ public:
   const Writer& writer() const { return output_.writer(); }
 
 private:
+  uint64_t bytes_pending_ {0};
+  uint64_t max_index {0};
+  std::map<uint64_t, std::string> reassembler_buffer_ {};
+  bool last_string {false};
+  uint64_t first_unassembled_index {0};
   ByteStream output_; // the Reassembler writes to this ByteStream
 };
