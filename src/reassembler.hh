@@ -1,9 +1,7 @@
 #pragma once
 
 #include "byte_stream.hh"
-
 #include <map>
-#include <unordered_map>
 class Reassembler
 {
 public:
