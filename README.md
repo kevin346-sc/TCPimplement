@@ -7,8 +7,8 @@ publicly by anybody.
 
 Website: https://cs144.stanford.edu
 
-![check0 passed](minnow/1718280598283.jpg)
-![check1 passed](minow/image.png)
+![check0 passed](1718280598283.jpg)
+![check1 passed](image.png)
 To set up the build system: `cmake -S . -B build`
 
 To compile: `cmake --build build`
