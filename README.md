@@ -6,7 +6,9 @@ preserve their value as a teaching tool, solutions not be posted
 publicly by anybody.
 
 Website: https://cs144.stanford.edu
-![](minnow/1718280598283.jpg)
+
+![check0 passed](minnow/1718280598283.jpg)
+![check1 passed](minow/image.png)
 To set up the build system: `cmake -S . -B build`
 
 To compile: `cmake --build build`
