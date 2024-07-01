@@ -27,4 +27,7 @@ public:
 
 private:
   Reassembler reassembler_;
+  uint64_t first_index { 0 };
+  Wrap32 zero_point { 0 };
+  bool init_flag { false };
 };
