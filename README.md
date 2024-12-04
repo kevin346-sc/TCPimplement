@@ -6,7 +6,9 @@ preserve their value as a teaching tool, solutions not be posted
 publicly by anybody.
 
 Website: https://cs144.stanford.edu
-![](minnow/1718280598283.jpg)
+
+![alt text](1718280598283.jpg)
+
 To set up the build system: `cmake -S . -B build`
 
 To compile: `cmake --build build`
